@@ -1,0 +1,45 @@
+fileFormatVersion: 2
+guid: fd055c03f2161114083358c4f1386c0e
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 7ff5ebea90ada4fe5aea1ff6169301d4, type: 3}
+  _prompt: "\u751F\u6210\u4E00\u4E2A\u78E8\u7802\u8D28\u611F\u98CE\u683C\u4E14\u901A\u8FC7\u8D34\u56FE\u5B9E\u73B0\u96D5\u82B1\u8680\u523B\u6548\u679C\u7684\u73BB\u7483\u6750\u8D28shader"
+  _cached: "Shader \"Unlit/Cartoon Stone\"\n{\n    Properties\n    {\n        _MainTex
+    (\"Base (RGB)\", 2D) = \"white\" {}\n        _FrostTex (\"Frost Pattern (RGBA)\",
+    2D) = \"white\" {}\n        _EtchTex (\"Etch Pattern (RGBA)\", 2D) = \"white\"
+    {}\n        _Color (\"Tint Color\", Color) = (1,1,1,1)\n        _FrostOpacity
+    (\"Frost Opacity\", Range(0,1)) = 0.5\n        _EtchStrength (\"Etch Strength\",
+    Range(0,1)) = 0.3\n    }\n    SubShader\n    {\n        Tags { \"RenderType\"=\"Transparent\"
+    \"Queue\"=\"Transparent\" \"IgnoreProjector\"=\"True\" }\n        Blend SrcAlpha
+    OneMinusSrcAlpha\n        ZWrite Off\n        Cull Off\n        Lighting Off\n\n       
+    Pass\n        {\n            HLSLPROGRAM\n            #pragma vertex vert\n           
+    #pragma fragment frag\n            #include \"UnityCG.cginc\"\n\n           
+    struct appdata\n            {\n                float4 vertex : POSITION;\n               
+    float2 uv : TEXCOORD0;\n            };\n\n            struct v2f\n           
+    {\n                float2 uv : TEXCOORD0;\n                float4 vertex : SV_POSITION;\n           
+    };\n\n            sampler2D _MainTex;\n            float4 _MainTex_ST;\n           
+    sampler2D _FrostTex;\n            float4 _FrostTex_ST;\n            sampler2D
+    _EtchTex;\n            float4 _EtchTex_ST;\n            float4 _Color;\n           
+    float _FrostOpacity;\n            float _EtchStrength;\n\n            v2f vert
+    (appdata v)\n            {\n                v2f o;\n                o.vertex
+    = UnityObjectToClipPos(v.vertex);\n                o.uv = TRANSFORM_TEX(v.uv,
+    _MainTex);\n                return o;\n            }\n\n            fixed4 frag
+    (v2f i) : SV_Target\n            {\n                fixed4 base = tex2D(_MainTex,
+    i.uv) * _Color;\n                fixed4 frost = tex2D(_FrostTex, i.uv);\n               
+    fixed4 etch = tex2D(_EtchTex, i.uv);\n\n                // Frost effect: mix
+    base with white/translucent color based on frost alpha\n                float
+    frostFactor = frost.r * _FrostOpacity;\n                fixed3 frostColor = lerp(base.rgb,
+    fixed3(1,1,1) * _Color.rgb, frostFactor);\n\n                // Etch effect:
+    darken or lighten based on etch alpha\n                float etchFactor = etch.r
+    * _EtchStrength;\n                fixed3 etched = frostColor + (frostColor -
+    fixed3(0.5,0.5,0.5)) * etchFactor;\n                // Keep colors clamped\n               
+    etched = saturate(etched);\n\n                // Alpha: base alpha minus frost
+    effect (makes more transparent where frost is heavy)\n                float alpha
+    = base.a * (1.0 - frostFactor * 0.5);\n                alpha = saturate(alpha);\n\n               
+    return fixed4(etched, alpha);\n            }\n            ENDHLSL\n        }\n   
+    }\n}"
