@@ -1,6 +1,7 @@
 # Markdown planning/docs requested to stay out of git
 *.md
 *.md.meta
+!/README.md
 
 # Unity generated folders
 [Ll]ibrary/
